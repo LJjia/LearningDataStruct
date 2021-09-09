@@ -6,21 +6,48 @@
  */
 #include "graph_store.h"
 
+/*!
+ * 打印顶点名字
+ * @param pVertex
+ */
+void PtMatrixVetex(GraphVertex*pVertex){
+    PRINT("Matrix access Vertex name %s",pVertex->name);
+}
+
+
 void TestInitMatrixGraph(){
-    GraphVertex aVertex[4] {
-        {"v0",0},
-        {"v1",1},
-        {"v2",2},
-        {"v3",3},
+    GraphVertex aVertex[9] {
+        {"A",0},
+        {"B",1},
+        {"C",2},
+        {"D",3},
+        {"E",4},
+        {"F",5},
+        {"G",6},
+        {"H",7},
+        {"I",8},
     };
-    GraphWeight aWeight[4][4] {
-            {0,1,1,1},
-            {1,0,1,0},
-            {1,1,0,1},
-            {1,0,1,0}
-    };
+    GraphWeight aWeight[9][9]{};
+
+    auto pGraph=new MatrixGraph(aVertex,&aWeight[0][0],9);
     PRINT("Init Matrix Graph ");
-    auto pGraph=new MatrixGraph(aVertex,&aWeight[0][0],4);
+    pGraph->InsertEdge("A","B");
+    pGraph->InsertEdge("A","F");
+    pGraph->InsertEdge("B","C");
+    pGraph->InsertEdge("B","I");
+    pGraph->InsertEdge("B","G");
+    pGraph->InsertEdge("C","I");
+    pGraph->InsertEdge("C","D");
+    pGraph->InsertEdge("D","I");
+    pGraph->InsertEdge("D","G");
+    pGraph->InsertEdge("D","H");
+    pGraph->InsertEdge("D","E");
+    pGraph->InsertEdge("E","H");
+    pGraph->InsertEdge("E","F");
+    pGraph->InsertEdge("F","G");
+    pGraph->InsertEdge("F","A");
+    pGraph->InsertEdge("G","H");
+    pGraph->DfsTraverse(PtMatrixVetex);
     delete pGraph;
 
 }

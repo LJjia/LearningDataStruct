@@ -6,7 +6,7 @@ void TestOrthogonalDirGraph();
 
 int main() {
     std::cout << "Hello, World!" << std::endl;
-//    TestInitMatrixGraph();
-    TestOrthogonalDirGraph();
+    TestInitMatrixGraph();
+//    TestOrthogonalDirGraph();
     return 0;
 }

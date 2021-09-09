@@ -8,6 +8,7 @@
 #define GRAPH_GRAPH_STORE_H
 
 #include <limits.h>
+#include <array>
 
 #include "data_type.h"
 
@@ -26,20 +27,30 @@ struct GraphWeight{
     int weight;
 };
 
+typedef void (*ProcMatrixVertexFunc)(GraphVertex*pVertex);
+
 /*!
- * 二维矩阵表示图
+ * 二维矩阵表示图,无向图,有项图和无向图表示方法类似
  */
 class MatrixGraph {
 public:
     MatrixGraph(GraphVertex*pVertex,GraphWeight*pWeight,int sVertexNum);
     ~MatrixGraph();
+    int InsertEdge(const char *pVertexA,const char (*pArrayVertexB)[MAX_NAME_LEN],int sEdgeNum);
+    int InsertEdge(const char *pVertexA,const char* pVertexB);
+    // 深度优先遍历
+    void DfsTraverse(ProcMatrixVertexFunc pFunc);
 
 private:
+    int FindIdxByName(const char *pName);
+    void dfs(int row,std::array<bool,MAX_VERTEX_NUM> & visited,ProcMatrixVertexFunc pFunc);
     int sVertexNum;
     GraphVertex* pVertex;
     GraphWeight*pWeight; //应该是一个二维数组指针,但是不确定行数,所以只能采用首地址的方式
 
 };
+
+
 
 struct OrthSideLink{
     int sTailIdx;

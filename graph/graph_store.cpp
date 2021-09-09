@@ -6,6 +6,9 @@
  */
 #include "graph_store.h"
 #include <cstring>
+#include <iostream>
+
+using namespace std;
 
 MatrixGraph::MatrixGraph(GraphVertex*pVertex,GraphWeight*pWeight,int sVertexNum){
     CHECK_PARAM(!pVertex||!pWeight||sVertexNum>MAX_VERTEX_NUM,);
@@ -14,12 +17,85 @@ MatrixGraph::MatrixGraph(GraphVertex*pVertex,GraphWeight*pWeight,int sVertexNum)
     CHECK_PARAM(!this->pWeight||!this->pVertex,);
     memcpy(this->pVertex,pVertex,sVertexNum* sizeof(GraphVertex));
     memcpy(this->pWeight,pWeight,sVertexNum*sVertexNum* sizeof(GraphWeight));
+    this->sVertexNum=sVertexNum;
 }
 
 MatrixGraph::~MatrixGraph(){
     free(this->pWeight);
     free(this->pVertex);
 }
+
+/*!
+ * 插入边关系,可以一次插入多条边,比如"A" + "B" "C" "D" 表示插入 "AB" "AC" "AD"
+ * @param pVertexA
+ * @param pArrayVertexB 数组指针,可以一次插入多条边
+ * @return
+ */
+int MatrixGraph::InsertEdge(const char *pVertexA,const char (*pArrayVertexB)[MAX_NAME_LEN],int sEdgeNum){
+    int sVertexA=0;
+    int sVertexB=0;
+    sVertexA=FindIdxByName(pVertexA);
+    CHECK_PARAM(sVertexA>=INVALID_ARRAY_IDX,FAILED);
+    for(int i=0;i<sEdgeNum;i++){
+        sVertexB=FindIdxByName(pArrayVertexB[i]);
+        CHECK_PARAM(sVertexB>=INVALID_ARRAY_IDX,FAILED);
+        pWeight[sVertexA*sVertexNum+sVertexB].weight=1;
+        pWeight[sVertexB*sVertexNum+sVertexA].weight=1;
+    }
+    return OK;
+}
+int MatrixGraph::InsertEdge(const char *pVertexA,const char* pVertexB){
+    int sVertexA=0;
+    int sVertexB=0;
+    sVertexA=FindIdxByName(pVertexA);
+    sVertexB=FindIdxByName(pVertexB);
+    CHECK_PARAM(sVertexA>=INVALID_ARRAY_IDX||sVertexB>=INVALID_ARRAY_IDX,FAILED);
+    pWeight[sVertexA*sVertexNum+sVertexB].weight=1;
+    pWeight[sVertexB*sVertexNum+sVertexA].weight=1;
+    return OK;
+}
+
+int MatrixGraph::FindIdxByName(const char *pName) {
+    for(int i=0;i<sVertexNum;i++){
+        if(!strcmp(pName,pVertex->name)){
+            return i;
+        }
+    }
+    return INVALID_ARRAY_IDX;
+}
+
+/*!
+ * 深度优先遍历访问某个顶点的所有路径
+ * @param row
+ */
+void MatrixGraph::dfs(int row,array<bool,MAX_VERTEX_NUM> & visited,ProcMatrixVertexFunc pFunc){
+    pFunc(&pVertex[row]);
+    visited[row]=true;
+    for(int i=0;i<sVertexNum;i++){
+        if((pWeight[row*sVertexNum+i].weight==1)&&visited[i]== false){
+            dfs(i,visited,pFunc);
+        }
+    }
+}
+
+/*!
+ * 深度优先遍历
+ * @param pFunc
+ */
+void MatrixGraph::DfsTraverse(ProcMatrixVertexFunc pFunc){
+    array<bool,MAX_VERTEX_NUM> visited{};
+    PRINT_MODE(PT_BLUE,"Matrix DfsTraverse vertex num %d",sVertexNum);
+    // 防止有的顶点是一个零星的顶点 不连通
+    for(int i=0;i<sVertexNum;i++){
+        if(visited[i]==false){
+            dfs(i,visited,pFunc);
+        }
+    }
+
+}
+
+
+
 
 OrthogonalDirGraph::OrthogonalDirGraph(){
     memset(stVertexArray, 0,sizeof(stVertexArray));
