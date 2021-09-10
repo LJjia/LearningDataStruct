@@ -10,89 +10,136 @@
 
 using namespace std;
 
-MatrixGraph::MatrixGraph(GraphVertex*pVertex,GraphWeight*pWeight,int sVertexNum){
-    CHECK_PARAM(!pVertex||!pWeight||sVertexNum>MAX_VERTEX_NUM,);
-    this->pVertex=(GraphVertex*)malloc(sizeof(GraphVertex)*sVertexNum);
-    this->pWeight=(GraphWeight*)malloc(sizeof(GraphWeight)*sVertexNum*sVertexNum);
-    CHECK_PARAM(!this->pWeight||!this->pVertex,);
-    memcpy(this->pVertex,pVertex,sVertexNum* sizeof(GraphVertex));
-    memcpy(this->pWeight,pWeight,sVertexNum*sVertexNum* sizeof(GraphWeight));
-    this->sVertexNum=sVertexNum;
+
+SimpleAdjacencyList::SimpleAdjacencyList(){
+    sVertexNum=0;
+    memset(stVertexArray,0,sizeof(stVertexArray));
+}
+SimpleAdjacencyList::~SimpleAdjacencyList(){
+
+}
+int SimpleAdjacencyList::InsertVertex(const char *pName,int data){
+    int sIdleIdx=0;
+    // 检查名称是否存在,存在不插入这个节点
+    sIdleIdx=FindVetexIdxByName(pName);
+    CHECK_PARAM(sIdleIdx<MAX_VERTEX_NUM,FAILED);
+    sIdleIdx=FindNextUnusedVertex();
+    CHECK_PARAM(sIdleIdx>=INVALID_ARRAY_IDX,FAILED);
+    stVertexArray[sIdleIdx].bUsed=true;
+    stVertexArray[sIdleIdx].data=data;
+    strncpy(stVertexArray[sIdleIdx].name,pName,MAX_NAME_LEN);
+    stVertexArray[sIdleIdx].pFirst= nullptr;
+    sVertexNum++;
+    return OK;
 }
 
-MatrixGraph::~MatrixGraph(){
-    free(this->pWeight);
-    free(this->pVertex);
+int SimpleAdjacencyList::InsertEdge(const char *pNameA,const char *pNameB){
+    int sAIdx=0;
+    int sBIdx=0;
+    AdjSide*pAdjSideA=nullptr;
+    sAIdx=FindVetexIdxByName(pNameA);
+    sBIdx=FindVetexIdxByName(pNameB);
+    CHECK_PARAM(sAIdx>=MAX_VERTEX_NUM||sBIdx>=MAX_VERTEX_NUM,FAILED);
+    pAdjSideA=(AdjSide*)malloc(sizeof(AdjSide));
+    CHECK_PARAM(!pAdjSideA,FAILED);
+    pAdjSideA->adjvex=sBIdx;
+    pAdjSideA->pNext=stVertexArray[sAIdx].pFirst;
+    return OK;
 }
 
 /*!
- * 插入边关系,可以一次插入多条边,比如"A" + "B" "C" "D" 表示插入 "AB" "AC" "AD"
- * @param pVertexA
- * @param pArrayVertexB 数组指针,可以一次插入多条边
+ * 返回下一个空闲节点的索引idx,没有返回-1
  * @return
  */
-int MatrixGraph::InsertEdge(const char *pVertexA,const char (*pArrayVertexB)[MAX_NAME_LEN],int sEdgeNum){
-    int sVertexA=0;
-    int sVertexB=0;
-    sVertexA=FindIdxByName(pVertexA);
-    CHECK_PARAM(sVertexA>=INVALID_ARRAY_IDX,FAILED);
-    for(int i=0;i<sEdgeNum;i++){
-        sVertexB=FindIdxByName(pArrayVertexB[i]);
-        CHECK_PARAM(sVertexB>=INVALID_ARRAY_IDX,FAILED);
-        pWeight[sVertexA*sVertexNum+sVertexB].weight=1;
-        pWeight[sVertexB*sVertexNum+sVertexA].weight=1;
+int SimpleAdjacencyList::FindNextUnusedVertex(){
+    int i=0;
+    for(;i<MAX_VERTEX_NUM;i++){
+        if(!stVertexArray[i].bUsed){
+            return i;
+        }
     }
-    return OK;
-}
-int MatrixGraph::InsertEdge(const char *pVertexA,const char* pVertexB){
-    int sVertexA=0;
-    int sVertexB=0;
-    sVertexA=FindIdxByName(pVertexA);
-    sVertexB=FindIdxByName(pVertexB);
-    CHECK_PARAM(sVertexA>=INVALID_ARRAY_IDX||sVertexB>=INVALID_ARRAY_IDX,FAILED);
-    pWeight[sVertexA*sVertexNum+sVertexB].weight=1;
-    pWeight[sVertexB*sVertexNum+sVertexA].weight=1;
-    return OK;
+
+    return INVALID_ARRAY_IDX;
 }
 
-int MatrixGraph::FindIdxByName(const char *pName) {
-    for(int i=0;i<sVertexNum;i++){
-        if(!strcmp(pName,pVertex->name)){
-            return i;
+
+/*!
+ * 寻找是否有同名节点,没有,返回INVALID_ARRAY_IDX,有返回对应索引
+ * @param pName
+ * @return
+ */
+int SimpleAdjacencyList::FindVetexIdxByName(const char *pName){
+    int i=0;
+    int sVertexCnt=0;
+    for(;i<MAX_VERTEX_NUM;i++){
+        if(stVertexArray[i].bUsed){
+            if(!strcmp(pName,stVertexArray[i].name)){
+                return i;
+            }
+            sVertexCnt++;
+            if(sVertexCnt>=sVertexNum){
+                break;
+            }
         }
     }
     return INVALID_ARRAY_IDX;
 }
 
-/*!
- * 深度优先遍历访问某个顶点的所有路径
- * @param row
- */
-void MatrixGraph::dfs(int row,array<bool,MAX_VERTEX_NUM> & visited,ProcMatrixVertexFunc pFunc){
-    pFunc(&pVertex[row]);
-    visited[row]=true;
-    for(int i=0;i<sVertexNum;i++){
-        if((pWeight[row*sVertexNum+i].weight==1)&&visited[i]== false){
-            dfs(i,visited,pFunc);
+void SimpleAdjacencyList::dfs(int idx,array<bool,MAX_VERTEX_NUM> &visited,pAdjacencyVertexFunc pFunc){
+    AdjSide*pSide= nullptr;
+    pFunc(&stVertexArray[idx]);
+    visited[idx]=true;
+    pSide=stVertexArray[idx].pFirst;
+//    PRINT("access node %s idx %d",stVertexArray[idx].name,idx)
+    while (pSide!=0){
+        if(visited[pSide->adjvex]== false){
+//            PRINT("visited side %d",pSide->adjvex);
+            dfs(pSide->adjvex,visited,pFunc);
         }
+        pSide=pSide->pNext;
     }
+
 }
 
-/*!
- * 深度优先遍历
- * @param pFunc
- */
-void MatrixGraph::DfsTraverse(ProcMatrixVertexFunc pFunc){
+void SimpleAdjacencyList::DfsTraverse(pAdjacencyVertexFunc pFunc){
     array<bool,MAX_VERTEX_NUM> visited{};
-    PRINT_MODE(PT_BLUE,"Matrix DfsTraverse vertex num %d",sVertexNum);
-    // 防止有的顶点是一个零星的顶点 不连通
+    PRINT_MODE(PT_BLUE,"SimpleAdjacencyList dfs vertex num %d",sVertexNum);
     for(int i=0;i<sVertexNum;i++){
-        if(visited[i]==false){
+        if(visited[i]== false){
             dfs(i,visited,pFunc);
         }
+
     }
+}
+
+
+SimpleUndirAdjacencyList::SimpleUndirAdjacencyList():SimpleAdjacencyList(){
 
 }
+SimpleUndirAdjacencyList::~SimpleUndirAdjacencyList(){
+
+}
+
+int SimpleUndirAdjacencyList::InsertUndirEdge(const char *pNameA, const char *pNameB) {
+    int sAIdx=0;
+    int sBIdx=0;
+    AdjSide*pAdjSideA=nullptr;
+    AdjSide*pAdjSideB=nullptr;
+    sAIdx=FindVetexIdxByName(pNameA);
+    sBIdx=FindVetexIdxByName(pNameB);
+    CHECK_PARAM(sAIdx>=MAX_VERTEX_NUM||sBIdx>=MAX_VERTEX_NUM,FAILED);
+    pAdjSideA=(AdjSide*)malloc(sizeof(AdjSide));
+    pAdjSideB=(AdjSide*)malloc(sizeof(AdjSide));
+    CHECK_PARAM(!pAdjSideA||!pAdjSideB,FAILED);
+    pAdjSideA->adjvex=sBIdx;
+    pAdjSideA->pNext=stVertexArray[sAIdx].pFirst;
+    stVertexArray[sAIdx].pFirst=pAdjSideA;
+    pAdjSideB->adjvex=sAIdx;
+    pAdjSideB->pNext=stVertexArray[sBIdx].pFirst;
+    stVertexArray[sBIdx].pFirst=pAdjSideB;
+    return OK;
+}
+
 
 
 
@@ -105,7 +152,7 @@ OrthogonalDirGraph::~OrthogonalDirGraph(){
     int sNodeCnt=0;
     OrthSideLink*pSide= nullptr;
     OrthSideLink*pFree= nullptr;
-    PRINT_MODE(PT_BLUE,"free Orthogonal Direct Graph")
+    PRINT_MODE(PT_BLUE,"free Orthogonal Direct Graph");
     for(int i=0;i<MAX_VERTEX_NUM;i++){
         pSide=stVertexArray[i].pFirstOut;
         while(pSide){
@@ -269,8 +316,6 @@ int OrthogonalDirGraph::FindNextUnusedVertex(){
     }
 
     return INVALID_ARRAY_IDX;
-
-
 }
 
 /*!

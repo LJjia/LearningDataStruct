@@ -7,46 +7,52 @@
 #ifndef GRAPH_GRAPH_STORE_H
 #define GRAPH_GRAPH_STORE_H
 
-#include <limits.h>
-#include <array>
 
+#include <array>
+#include "graph_common.h"
 #include "data_type.h"
 
-#define INVALID_WEIGHT INT INT_MAX
-#define MAX_VERTEX_NUM 100
-#define MAX_NAME_LEN 16
-#define INVALID_ARRAY_IDX INT_MAX
-
-
-struct GraphVertex{
-    char name[16];
+struct AdjSide{
+    int adjvex;
+    AdjSide*pNext;
+};
+struct AdjVertex{
+    char name[MAX_NAME_LEN];
     int data;
+    bool bUsed;
+    AdjSide *pFirst;
+
 };
 
-struct GraphWeight{
-    int weight;
-};
 
-typedef void (*ProcMatrixVertexFunc)(GraphVertex*pVertex);
+typedef void (*pAdjacencyVertexFunc)(AdjVertex*pVertex);
 
 /*!
- * 二维矩阵表示图,无向图,有项图和无向图表示方法类似
+ * 简单邻接表,有向图
  */
-class MatrixGraph {
+class SimpleAdjacencyList{
 public:
-    MatrixGraph(GraphVertex*pVertex,GraphWeight*pWeight,int sVertexNum);
-    ~MatrixGraph();
-    int InsertEdge(const char *pVertexA,const char (*pArrayVertexB)[MAX_NAME_LEN],int sEdgeNum);
-    int InsertEdge(const char *pVertexA,const char* pVertexB);
-    // 深度优先遍历
-    void DfsTraverse(ProcMatrixVertexFunc pFunc);
-
-private:
-    int FindIdxByName(const char *pName);
-    void dfs(int row,std::array<bool,MAX_VERTEX_NUM> & visited,ProcMatrixVertexFunc pFunc);
+    SimpleAdjacencyList();
+    ~SimpleAdjacencyList();
+    int InsertVertex(const char *pName,int data);
+    int InsertEdge(const char *pNameA,const char *pNameB);
+    void DfsTraverse(pAdjacencyVertexFunc pFunc);
+protected:
+    void dfs(int idx,std::array<bool,MAX_VERTEX_NUM> &visited,pAdjacencyVertexFunc pFunc);
+    int FindNextUnusedVertex();
+    int FindVetexIdxByName(const char *pName);
     int sVertexNum;
-    GraphVertex* pVertex;
-    GraphWeight*pWeight; //应该是一个二维数组指针,但是不确定行数,所以只能采用首地址的方式
+    AdjVertex stVertexArray[MAX_VERTEX_NUM];
+};
+
+/*!
+ * 简单邻接表,无项图
+ */
+class SimpleUndirAdjacencyList:public SimpleAdjacencyList{
+public:
+    SimpleUndirAdjacencyList();
+    ~SimpleUndirAdjacencyList();
+    int InsertUndirEdge(const char *pNameA,const char *pNameB);
 
 };
 
@@ -85,7 +91,6 @@ public:
 
 private:
     int FindNextUnusedVertex();
-
     int FindVetexIdxByName(const char *pName);
     OrthVertex stVertexArray[MAX_VERTEX_NUM];
     int sVertexNum;
