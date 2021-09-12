@@ -34,10 +34,13 @@ public:
     int InserEdge(const char *pVertexA,const char* pVertexB);
     // 深度优先遍历
     void DfsTraverse(ProcMatrixVertexFunc pFunc);
+    // 广度优先遍历
+    void BfsTraverse(ProcMatrixVertexFunc pFunc);
 
 protected:
     int FindIdxByName(const char *pName);
     void dfs(int row,std::array<bool,MAX_VERTEX_NUM> & visited,ProcMatrixVertexFunc pFunc);
+    void bfs(int row,std::array<bool,MAX_VERTEX_NUM> & visited,ProcMatrixVertexFunc pFunc);
     int sVertexNum;
     GraphVertex* pVertex;
     GraphWeight*pWeight; //应该是一个二维数组指针,但是不确定行数,所以只能采用首地址的方式
@@ -50,7 +53,7 @@ protected:
 class MatrixUndirGraph:public MatrixGraph{
 public:
     MatrixUndirGraph(GraphVertex*pVertex,int sVertexNum);
-    int InserUndirtEdge(const char *pVertexA,const char* pVertexB);
+    int InserUndirtEdge(const char *pVertexA,const char* pVertexB,int weight=1);
 
 };
 

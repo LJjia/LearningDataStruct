@@ -6,6 +6,7 @@
  */
 #include "MatrixGraph.h"
 #include <iostream>
+#include <queue>
 
 using namespace std;
 
@@ -72,6 +73,9 @@ int MatrixGraph::FindIdxByName(const char *pName) {
  * @param row
  */
 void MatrixGraph::dfs(int row,array<bool,MAX_VERTEX_NUM> & visited,ProcMatrixVertexFunc pFunc){
+    if (visited[row]){
+        return;
+    }
     pFunc(&pVertex[row]);
     visited[row]=true;
     for(int i=0;i<sVertexNum;i++){
@@ -97,15 +101,61 @@ void MatrixGraph::DfsTraverse(ProcMatrixVertexFunc pFunc){
 
 }
 
+/*!
+ * 函数外部已经考虑过,不是访问过得节点,不会调用这个函数
+ * @param row
+ * @param visited
+ * @param pFunc
+ */
+void MatrixGraph::bfs(int row,array<bool,MAX_VERTEX_NUM> & visited,ProcMatrixVertexFunc pFunc){
+    if (visited[row]){
+        return;
+    }
+    queue <int > queue1;
+    queue1.push(row);
+    while(!queue1.empty()){
+        int sOutIdx=queue1.front();
+        // 如果这个节点没有访问过,则访问,并将对应访问位置1
+        // 并且将这个节点关联的节点push进队列
+        if(!visited[sOutIdx]){
+            pFunc(&pVertex[sOutIdx]);
+            visited[sOutIdx]=true;
+//            PRINT("pop name %s",pVertex[sOutIdx].name);
+            for(int sAddIdx=0;sAddIdx<sVertexNum;sAddIdx++){
+                if(pWeight[sOutIdx*sVertexNum+sAddIdx].weight&&!visited[sAddIdx]){
+                    queue1.push(sAddIdx);
+//                    PRINT("push name %s",pVertex[sAddIdx].name);
+                }
+            }
+        }
+        // 不管之前这个节点有没有访问过,都会将这个节点pop走
+        queue1.pop();
 
-int MatrixUndirGraph::InserUndirtEdge(const char *pVertexA,const char* pVertexB){
+    }
+}
+
+
+
+void MatrixGraph::BfsTraverse(ProcMatrixVertexFunc pFunc){
+    array<bool,MAX_VERTEX_NUM> visited{};
+    PRINT_MODE(PT_BLUE,"Matrix BfsTraverse vertex num %d",sVertexNum);
+    // 防止有的顶点是一个零星的顶点 不连通
+    for(int i=0;i<sVertexNum;i++){
+        if(visited[i]==false){
+            bfs(i,visited,pFunc);
+        }
+    }
+}
+
+
+int MatrixUndirGraph::InserUndirtEdge(const char *pVertexA,const char* pVertexB,int weight){
     int sVertexA=0;
     int sVertexB=0;
     sVertexA=FindIdxByName(pVertexA);
     sVertexB=FindIdxByName(pVertexB);
     CHECK_PARAM(sVertexA>=INVALID_ARRAY_IDX||sVertexB>=INVALID_ARRAY_IDX,FAILED);
-    pWeight[sVertexA*sVertexNum+sVertexB].weight=1;
-    pWeight[sVertexB*sVertexNum+sVertexA].weight=1;
+    pWeight[sVertexA*sVertexNum+sVertexB].weight=weight;
+    pWeight[sVertexB*sVertexNum+sVertexA].weight=weight;
     return OK;
 }
 

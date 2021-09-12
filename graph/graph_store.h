@@ -37,8 +37,10 @@ public:
     int InsertVertex(const char *pName,int data);
     int InsertEdge(const char *pNameA,const char *pNameB);
     void DfsTraverse(pAdjacencyVertexFunc pFunc);
+    void BfsTraverse(pAdjacencyVertexFunc pFunc);
 protected:
     void dfs(int idx,std::array<bool,MAX_VERTEX_NUM> &visited,pAdjacencyVertexFunc pFunc);
+    void bfs(int idx,std::array<bool,MAX_VERTEX_NUM> &visited,pAdjacencyVertexFunc pFunc);
     int FindNextUnusedVertex();
     int FindVetexIdxByName(const char *pName);
     int sVertexNum;

@@ -34,7 +34,7 @@ void TestInitMatrixGraph(){
     };
     GraphWeight aWeight[9][9]{};
 
-    auto pGraph=new MatrixGraph(aVertex,&aWeight[0][0],9);
+    auto pGraph=new MatrixGraph(aVertex,9);
     PRINT("Init Matrix Graph ");
     pGraph->InserEdge("A","B");
     pGraph->InserEdge("A","F");
@@ -53,6 +53,7 @@ void TestInitMatrixGraph(){
     pGraph->InserEdge("F","A");
     pGraph->InserEdge("G","H");
     pGraph->DfsTraverse(PtMatrixVetex);
+    pGraph->BfsTraverse(PtMatrixVetex);
     delete pGraph;
 
 }
@@ -90,6 +91,7 @@ void TestInitUndirMatrixGraph(){
     pGraph->InserUndirtEdge("F","A");
     pGraph->InserUndirtEdge("G","H");
     pGraph->DfsTraverse(PtMatrixVetex);
+    pGraph->BfsTraverse(PtMatrixVetex);
     delete pGraph;
 
 }
@@ -107,6 +109,7 @@ void TestAdjacencyUndirGraph(){
     pGraph->InsertUndirEdge("D","A");
     pGraph->InsertUndirEdge("A","E");
     pGraph->DfsTraverse(PtSimpleAdjaencyVetex);
+    pGraph->BfsTraverse(PtSimpleAdjaencyVetex);
 };
 
 void TestOrthogonalDirGraph(){

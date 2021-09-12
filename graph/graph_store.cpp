@@ -7,6 +7,7 @@
 #include "graph_store.h"
 #include <cstring>
 #include <iostream>
+#include <queue>
 
 using namespace std;
 
@@ -87,6 +88,9 @@ int SimpleAdjacencyList::FindVetexIdxByName(const char *pName){
 
 void SimpleAdjacencyList::dfs(int idx,array<bool,MAX_VERTEX_NUM> &visited,pAdjacencyVertexFunc pFunc){
     AdjSide*pSide= nullptr;
+    if(visited[idx]){
+        return ;
+    }
     pFunc(&stVertexArray[idx]);
     visited[idx]=true;
     pSide=stVertexArray[idx].pFirst;
@@ -107,6 +111,45 @@ void SimpleAdjacencyList::DfsTraverse(pAdjacencyVertexFunc pFunc){
     for(int i=0;i<sVertexNum;i++){
         if(visited[i]== false){
             dfs(i,visited,pFunc);
+        }
+
+    }
+}
+
+
+void SimpleAdjacencyList::bfs(int idx,array<bool,MAX_VERTEX_NUM> &visited,pAdjacencyVertexFunc pFunc){
+    AdjSide *pAdjVertex= nullptr;
+    if(visited[idx]){
+        return ;
+    }
+    queue <int> queue1;
+    queue1.push(idx);
+    while(!queue1.empty()){
+        int sOutIdx=queue1.front();
+        if(!visited[sOutIdx]){
+            pFunc(&stVertexArray[sOutIdx]);
+            visited[sOutIdx]=true;
+            pAdjVertex=stVertexArray[sOutIdx].pFirst;
+            while (pAdjVertex!=nullptr){
+                if(!visited[pAdjVertex->adjvex]){
+//                    PRINT("push node name %s",stVertexArray[pAdjVertex->adjvex].name);
+                    queue1.push(pAdjVertex->adjvex);
+                }
+                pAdjVertex=pAdjVertex->pNext;
+            }
+        }
+//        PRINT("pop node name %s",stVertexArray[sOutIdx].name);
+        queue1.pop();
+    }
+
+}
+
+void SimpleAdjacencyList::BfsTraverse(pAdjacencyVertexFunc pFunc){
+    array<bool,MAX_VERTEX_NUM> visited{};
+    PRINT_MODE(PT_BLUE,"SimpleAdjacencyList bfs vertex num %d",sVertexNum);
+    for(int i=0;i<sVertexNum;i++){
+        if(visited[i]== false){
+            bfs(i,visited,pFunc);
         }
 
     }
