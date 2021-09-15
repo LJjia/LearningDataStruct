@@ -23,7 +23,7 @@ struct GraphWeight{
 typedef void (*ProcMatrixVertexFunc)(GraphVertex*pVertex);
 
 /*!
- * 二维矩阵表示图,有向,有项图和无向图表示方法类似
+ * 二维矩阵表示图,邻接矩阵,有向,有项图和无向图表示方法类似
  */
 class MatrixGraph {
 public:
@@ -48,7 +48,7 @@ protected:
 };
 
 /*!
- * 二维矩阵表示图,无向图
+ * 二维矩阵表示图,邻接矩阵,无向图
  */
 class MatrixUndirGraph:public MatrixGraph{
 public:
