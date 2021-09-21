@@ -31,11 +31,15 @@ public:
     // 自动申请权重矩阵
     MatrixGraph(GraphVertex*pVertex,int sVertexNum);
     ~MatrixGraph();
-    int InserEdge(const char *pVertexA,const char* pVertexB);
+    int InsertEdge(const char *pVertexA,const char* pVertexB,int weight=1);
     // 深度优先遍历
     void DfsTraverse(ProcMatrixVertexFunc pFunc);
     // 广度优先遍历
     void BfsTraverse(ProcMatrixVertexFunc pFunc);
+    // 计算最小生成树
+    void  CalcMiniSpanTree();
+    void  CalcShortestPathDijkstra(const char *pStart,const char *pEnd);
+    void Disp();
 
 protected:
     int FindIdxByName(const char *pName);
@@ -53,7 +57,7 @@ protected:
 class MatrixUndirGraph:public MatrixGraph{
 public:
     MatrixUndirGraph(GraphVertex*pVertex,int sVertexNum);
-    int InserUndirtEdge(const char *pVertexA,const char* pVertexB,int weight=1);
+    int InsertUndirEdge(const char *pVertexA,const char* pVertexB,int weight=1);
 
 };
 

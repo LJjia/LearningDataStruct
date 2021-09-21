@@ -9,7 +9,7 @@
 
 #include <limits.h>
 
-#define INVALID_WEIGHT INT INT_MAX
+#define INVALID_WEIGHT 1000
 #define MAX_VERTEX_NUM 100
 #define MAX_NAME_LEN 16
 #define INVALID_ARRAY_IDX INT_MAX

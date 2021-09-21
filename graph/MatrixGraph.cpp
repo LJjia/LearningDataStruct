@@ -26,7 +26,17 @@ MatrixGraph::MatrixGraph(GraphVertex*pVertex,int sVertexNum){
     this->pWeight=(GraphWeight*)malloc(sizeof(GraphWeight)*sVertexNum*sVertexNum);
     CHECK_PARAM(!this->pWeight||!this->pVertex,);
     memcpy(this->pVertex,pVertex,sVertexNum* sizeof(GraphVertex));
-    memset(this->pWeight,0,sVertexNum*sVertexNum* sizeof(GraphWeight));
+    // 默认元素赋值为-1
+    // 但是需要注意,不可使用memset赋值
+    // 因为是char类型赋值,所以赋值完后,所以数据为0xff,而不是0x7f
+    for(int idx=0;idx<sVertexNum*sVertexNum;idx++){
+        this->pWeight[idx].weight=INVALID_WEIGHT;
+    }
+
+    for(int i=0;i<sVertexNum;i++){
+        // 对角线元素赋值为∞,表示不存在这样的边
+        this->pWeight[i*sVertexNum+i].weight=0;
+    }
     this->sVertexNum=sVertexNum;
 //    PRINT_MODE(PT_BLUE,"Matrix init Vertex num %d",sVertexNum);
 //    for(int i=0;i<sVertexNum;i++){
@@ -47,13 +57,13 @@ MatrixGraph::~MatrixGraph(){
  * @param pVertexB
  * @return
  */
-int MatrixGraph::InserEdge(const char *pVertexA,const char* pVertexB){
+int MatrixGraph::InsertEdge(const char *pVertexA,const char* pVertexB,int weight){
     int sVertexA=0;
     int sVertexB=0;
     sVertexA=FindIdxByName(pVertexA);
     sVertexB=FindIdxByName(pVertexB);
     CHECK_PARAM(sVertexA>=INVALID_ARRAY_IDX||sVertexB>=INVALID_ARRAY_IDX,FAILED);
-    pWeight[sVertexA*sVertexNum+sVertexB].weight=1;
+    pWeight[sVertexA*sVertexNum+sVertexB].weight=weight;
     return OK;
 
 }
@@ -66,6 +76,18 @@ int MatrixGraph::FindIdxByName(const char *pName) {
         }
     }
     return INVALID_ARRAY_IDX;
+}
+
+void MatrixGraph::Disp(){
+    printf("disp data %d %x\n",INT_MAX,INT_MAX);
+    PRINT_MODE(PT_BLUE,"Disp Matrix graph Vertex num %d",sVertexNum);
+    for(int i=0;i<sVertexNum;i++){
+        printf("array %d:",i);
+        for(int j=0;j<sVertexNum;j++){
+            printf(" %4d\t",pWeight[i*sVertexNum+j].weight);
+        }
+        printf("\n");
+    }
 }
 
 /*!
@@ -147,8 +169,133 @@ void MatrixGraph::BfsTraverse(ProcMatrixVertexFunc pFunc){
     }
 }
 
+/*!
+ * 计算最小生成树
+ */
+void MatrixGraph::CalcMiniSpanTree(){
+    int aWeight[MAX_VERTEX_NUM]{};
+    int i=0;
+    int sTotalCost=0;
+    Disp();
+    for(int i=0;i<sVertexNum;i++){
+        aWeight[i]=INVALID_WEIGHT;
+    }
+    aWeight[0]=0;
+    for(i=1;i<sVertexNum;i++){
+        // 首先计算第一行 不允许中间有weight=0边存在的情况
+        if(pWeight[0+i].weight>0&&pWeight[0+i].weight<INVALID_WEIGHT){
+            // 首次记录下到v0最近的距离
+            aWeight[i]=pWeight[i].weight;
+        }
+    }
+    PRINT("first use add v0 to set");
+    for(int line=1;line<sVertexNum;line++){
+        // 寻找最小非0值的索引
+        int sMinIdx=-1;
+        int sMinValue=INVALID_WEIGHT;
+        for(i=0;i<sVertexNum;i++){
+            if(aWeight[i]<sMinValue&&aWeight[i]>0){
+                sMinValue=aWeight[i];
+                sMinIdx=i;
+            }
+        }
+//        for(int tmp=0;tmp<sVertexNum;tmp++){
+//            printf("aweight %d\n",aWeight[tmp]);
+//        }
+        PRINT("next add v%d weight %d",sMinIdx,sMinValue);
+        aWeight[sMinIdx]=0;
+        sTotalCost+=sMinValue;
+        for(i=0;i<sVertexNum;i++){
+            if(pWeight[sMinIdx*sVertexNum+i].weight>0&&pWeight[sMinIdx*sVertexNum+i].weight<INVALID_WEIGHT){
+                if(pWeight[sMinIdx*sVertexNum+i].weight<aWeight[i]){
+                    aWeight[i]=pWeight[sMinIdx*sVertexNum+i].weight;
+                }
+            }
+        }
+    }
 
-int MatrixUndirGraph::InserUndirtEdge(const char *pVertexA,const char* pVertexB,int weight){
+    PRINT("calc end sTotal cost %d",sTotalCost);
+
+}
+
+/*!
+ * 计算v0到某个点的最短路径
+ */
+void MatrixGraph::CalcShortestPathDijkstra(const char *pStart,const char *pEnd){
+    int sStartIdx=0;
+    int sEndIdx=0;
+    int aMiniCost[MAX_VERTEX_NUM];
+    bool bCalc[MAX_VERTEX_NUM];
+    int aFront[MAX_VERTEX_NUM];
+    int i=0;
+    int sCurMinValue=INVALID_WEIGHT;
+    int sCurMinIdx=INVALID_ARRAY_IDX;
+    sStartIdx=FindIdxByName(pStart);
+    sEndIdx=FindIdxByName(pEnd);
+    if(sStartIdx>=MAX_VERTEX_NUM||sEndIdx>=MAX_VERTEX_NUM){
+        PRINT_ERR("not find start %s %d end %s %d",pStart,sStartIdx,pEnd,sEndIdx);
+        return ;
+    }
+    for(i=0;i<sVertexNum;i++){
+        aMiniCost[i]=INVALID_WEIGHT;
+        bCalc[i]= false;
+        aFront[i]=INVALID_ARRAY_IDX;
+    }
+    // v0先赋初始值
+    bCalc[sStartIdx]=true;
+    for(i=0;i<sVertexNum;i++){
+        if(i!=sStartIdx&&pWeight[sStartIdx*sVertexNum+i].weight!=INVALID_WEIGHT){
+            aMiniCost[i]=pWeight[sStartIdx*sVertexNum+i].weight;
+            aFront[i]=sStartIdx;
+        }
+    }
+    aMiniCost[sStartIdx]=0;
+
+    while(1)
+    {
+        sCurMinValue=INVALID_WEIGHT;
+        sCurMinIdx=INVALID_ARRAY_IDX;
+        for(int i=0;i<sVertexNum;i++){
+            if(!bCalc[i]&&aMiniCost[i]<sCurMinValue){
+                sCurMinValue=aMiniCost[i];
+                sCurMinIdx=i;
+            }
+
+        }
+        PRINT("%s next %s min value %d",pVertex[sStartIdx].name,pVertex[sCurMinIdx].name,sCurMinValue);
+        if(sCurMinIdx==sEndIdx){
+            PRINT("end find minest path cost %d",sCurMinValue);
+            break;
+        }
+        bCalc[sCurMinIdx]=true;
+        for(i=0;i<sVertexNum;i++){
+            // 每次更新一个顶点的影响,并且更新的这个顶点,不会对之后顶点的更新带来影响,不会产生虚假最小值的顶点
+            // (因为这个更新的顶点是当前所有顶点中最小值,如果更新更大的顶点,可能会出现虚假最小值,由最小值顶点带来的影响)
+            if(i!=sCurMinIdx&&pWeight[sCurMinIdx*sVertexNum+i].weight!=INVALID_WEIGHT){
+                // 如果当前这个节点有连接
+                if(pWeight[sCurMinIdx*sVertexNum+i].weight+sCurMinValue<aMiniCost[i]){
+                    // 并且链接作用于的作用效果比先前的损失要小
+                    // 则更新初始节点到i节点的损失,表示start顶点可以使用aMiniCost[i]的权重走到pVertex[i]顶点
+                    aMiniCost[i]=pWeight[sCurMinIdx*sVertexNum+i].weight+sCurMinValue;
+                    aFront[i]=sCurMinIdx;
+                }
+            }
+        }
+        // 之后再找损失最低的那个顶点
+    }
+    PRINT("find minest cost %d",aMiniCost[sEndIdx]);
+    int sFrontIdx=sEndIdx;
+
+    for(i=0;i<sVertexNum&&sFrontIdx!=INVALID_ARRAY_IDX;i++){
+        printf("vertex %d->",sFrontIdx);
+        sFrontIdx=aFront[sFrontIdx];
+    }
+    printf("\n");
+
+}
+
+
+int MatrixUndirGraph::InsertUndirEdge(const char *pVertexA,const char* pVertexB,int weight){
     int sVertexA=0;
     int sVertexB=0;
     sVertexA=FindIdxByName(pVertexA);
