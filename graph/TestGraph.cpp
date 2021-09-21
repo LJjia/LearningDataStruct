@@ -135,6 +135,7 @@ void TestCalcMinestPath(){
     pGraph->InsertUndirEdge("v6","v8",7);
     pGraph->InsertUndirEdge("v7","v8",4);
     pGraph->CalcShortestPathDijkstra("v0","v8");
+    pGraph->CalcShortestPathFolyd();
     delete pGraph;
 }
 

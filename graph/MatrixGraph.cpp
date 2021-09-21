@@ -294,6 +294,32 @@ void MatrixGraph::CalcShortestPathDijkstra(const char *pStart,const char *pEnd){
 
 }
 
+void MatrixGraph::CalcShortestPathFolyd(){
+    int *pTmp=nullptr;
+    pTmp=new int[sVertexNum*sVertexNum];
+    memcpy(pTmp,pWeight,sVertexNum*sVertexNum* sizeof(int));
+    int i,j,k;
+    for(i=sVertexNum-1;i>=0;i--){
+        for(j=0;j<sVertexNum;j++){
+            for(k=0;k<sVertexNum;k++){
+                if(pTmp[j*sVertexNum+k]>pTmp[j*sVertexNum+i]+pTmp[i*sVertexNum+k]){
+                    pTmp[j*sVertexNum+k]=pTmp[j*sVertexNum+i]+pTmp[i*sVertexNum+k];
+                }
+            }
+        }
+    }
+    for(i=0;i<sVertexNum;i++){
+        printf("array %d:",i);
+        for(j=0;j<sVertexNum;j++){
+            printf(" %4d\t",pTmp[i*sVertexNum+j]);
+        }
+        printf("\n");
+    }
+
+
+    delete [] pTmp;
+}
+
 
 int MatrixUndirGraph::InsertUndirEdge(const char *pVertexA,const char* pVertexB,int weight){
     int sVertexA=0;

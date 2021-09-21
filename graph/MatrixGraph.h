@@ -37,8 +37,9 @@ public:
     // 广度优先遍历
     void BfsTraverse(ProcMatrixVertexFunc pFunc);
     // 计算最小生成树
-    void  CalcMiniSpanTree();
-    void  CalcShortestPathDijkstra(const char *pStart,const char *pEnd);
+    void CalcMiniSpanTree();
+    void CalcShortestPathDijkstra(const char *pStart,const char *pEnd);
+    void CalcShortestPathFolyd();
     void Disp();
 
 protected:
