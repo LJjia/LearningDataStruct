@@ -7,7 +7,7 @@
 #include "graph_store.h"
 #include "MatrixGraph.h"
 #include "EdgeArray.h"
-
+#include <cstring>
 /*!
  * 打印顶点名字
  * @param pVertex
@@ -135,7 +135,7 @@ void TestCalcMinestPath(){
     pGraph->InsertUndirEdge("v6","v8",7);
     pGraph->InsertUndirEdge("v7","v8",4);
     pGraph->CalcShortestPathDijkstra("v0","v8");
-    pGraph->CalcShortestPathFolyd();
+    pGraph->CalcShortestPathFloyd();
     delete pGraph;
 }
 
@@ -197,6 +197,72 @@ void TestAdjacencyUndirGraph(){
     pGraph->DfsTraverse(PtSimpleAdjaencyVetex);
     pGraph->BfsTraverse(PtSimpleAdjaencyVetex);
 };
+
+
+/*!
+ * 测试拓扑排序
+ */
+void TestTopologicSort(){
+    char szName[16]{"v0"};
+    auto pGraph=new SimpleAdjacencyList();
+    for(int i=0;i<14;i++){
+        sprintf(szName,"v%d",i);
+        pGraph->InsertVertex(szName,i);
+    }
+
+    pGraph->InsertEdge("v0","v11");
+    pGraph->InsertEdge("v0","v4");
+    pGraph->InsertEdge("v0","v5");
+    pGraph->InsertEdge("v1","v4");
+    pGraph->InsertEdge("v1","v8");
+    pGraph->InsertEdge("v1","v2");
+    pGraph->InsertEdge("v2","v5");
+    pGraph->InsertEdge("v2","v9");
+    pGraph->InsertEdge("v2","v6");
+    pGraph->InsertEdge("v3","v2");
+    pGraph->InsertEdge("v3","v13");
+    pGraph->InsertEdge("v4","v7");
+    pGraph->InsertEdge("v5","v8");
+    pGraph->InsertEdge("v5","v12");
+    pGraph->InsertEdge("v6","v5");
+    pGraph->InsertEdge("v8","v7");
+    pGraph->InsertEdge("v9","v11");
+    pGraph->InsertEdge("v9","v10");
+    pGraph->InsertEdge("v10","v13");
+    pGraph->InsertEdge("v12","v9");
+    pGraph->InsertEdge("v7","v0");
+    pGraph->TopologicalSort();
+    delete pGraph;
+};
+
+/*!
+ * 测试关键路径
+ */
+void TestKeyPath(){
+    char szName[16]{"v0"};
+    auto pGraph=new SimpleAdjacencyList();
+    for(int i=0;i<10;i++){
+        sprintf(szName,"v%d",i);
+        pGraph->InsertVertex(szName,i);
+    }
+
+    pGraph->InsertEdge("v0","v1",3);
+    pGraph->InsertEdge("v0","v2",4);
+    pGraph->InsertEdge("v1","v3",5);
+    pGraph->InsertEdge("v1","v4",6);
+    pGraph->InsertEdge("v2","v3",8);
+    pGraph->InsertEdge("v2","v5",7);
+    pGraph->InsertEdge("v3","v4",3);
+    pGraph->InsertEdge("v4","v6",9);
+    pGraph->InsertEdge("v4","v7",4);
+    pGraph->InsertEdge("v5","v7",6);
+    pGraph->InsertEdge("v6","v9",2);
+    pGraph->InsertEdge("v7","v8",5);
+    pGraph->InsertEdge("v8","v9",3);
+
+    pGraph->CalcKeyPath();
+};
+
 
 void TestOrthogonalDirGraph(){
     auto pGraph=new OrthogonalDirGraph();

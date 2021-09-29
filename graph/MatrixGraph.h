@@ -39,7 +39,8 @@ public:
     // 计算最小生成树
     void CalcMiniSpanTree();
     void CalcShortestPathDijkstra(const char *pStart,const char *pEnd);
-    void CalcShortestPathFolyd();
+    void CalcShortestPathFloyd();
+    void FloydAccessVertex(int *pPath,int start,int end);
     void Disp();
 
 protected:

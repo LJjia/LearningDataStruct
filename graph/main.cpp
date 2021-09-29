@@ -8,6 +8,8 @@ void TestAdjacencyUndirGraph();
 void TestEdgeArray();
 void TestCalcMiniSpanTree();
 void TestCalcMinestPath();
+//void TestTopologicSort();
+void TestKeyPath();
 
 using namespace std;
 struct StSizeof{
@@ -23,7 +25,8 @@ int main() {
 //    TestAdjacencyUndirGraph();
 //    TestEdgeArray();
 //    TestCalcMiniSpanTree();
-    TestCalcMinestPath();
-
+//    TestCalcMinestPath();
+//    TestTopologicSort();
+    TestKeyPath();
     return 0;
 }

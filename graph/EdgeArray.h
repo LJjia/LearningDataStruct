@@ -27,6 +27,7 @@ namespace EdgeArraySpace {
     struct VertexDesc {
         char name[MAX_NAME_LEN];
         int data;
+        int sInDegree;
         bool bValid;
     };
 

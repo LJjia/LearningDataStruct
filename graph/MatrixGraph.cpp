@@ -294,16 +294,26 @@ void MatrixGraph::CalcShortestPathDijkstra(const char *pStart,const char *pEnd){
 
 }
 
-void MatrixGraph::CalcShortestPathFolyd(){
+void MatrixGraph::CalcShortestPathFloyd(){
     int *pTmp=nullptr;
+    int *pPath= nullptr;
     pTmp=new int[sVertexNum*sVertexNum];
-    memcpy(pTmp,pWeight,sVertexNum*sVertexNum* sizeof(int));
+    pPath=new int[sVertexNum*sVertexNum];
     int i,j,k;
+    memcpy(pTmp,pWeight,sVertexNum*sVertexNum* sizeof(int));
+    for(int col=0;col<sVertexNum;col++){
+        for(int row=0;row<sVertexNum;row++){
+            pPath[row*sVertexNum+col]=col;
+        }
+    }
+
+
     for(i=sVertexNum-1;i>=0;i--){
         for(j=0;j<sVertexNum;j++){
             for(k=0;k<sVertexNum;k++){
                 if(pTmp[j*sVertexNum+k]>pTmp[j*sVertexNum+i]+pTmp[i*sVertexNum+k]){
                     pTmp[j*sVertexNum+k]=pTmp[j*sVertexNum+i]+pTmp[i*sVertexNum+k];
+                    pPath[j*sVertexNum+k]=i;
                 }
             }
         }
@@ -315,11 +325,29 @@ void MatrixGraph::CalcShortestPathFolyd(){
         }
         printf("\n");
     }
-
+    printf("---------------------\n");
+    for(i=0;i<sVertexNum;i++){
+        printf("array %d:",i);
+        for(j=0;j<sVertexNum;j++){
+            printf(" %4d\t",pPath[i*sVertexNum+j]);
+        }
+        printf("\n");
+    }
+    printf("---------------------\n");
+    FloydAccessVertex(pPath,0,8);
 
     delete [] pTmp;
 }
 
+void MatrixGraph::FloydAccessVertex(int *pPath,int start,int end){
+    if(pPath[start*sVertexNum+end]!=end){
+        FloydAccessVertex(pPath,start,pPath[start*sVertexNum+end]);
+        FloydAccessVertex(pPath,pPath[start*sVertexNum+end],end);
+    }
+    else{
+        printf("path %s -> %s ",pVertex[start].name,pVertex[end].name);
+    }
+}
 
 int MatrixUndirGraph::InsertUndirEdge(const char *pVertexA,const char* pVertexB,int weight){
     int sVertexA=0;

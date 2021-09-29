@@ -8,6 +8,8 @@
 #include <cstring>
 #include <iostream>
 #include <queue>
+#include <stack>
+#include <array>
 
 using namespace std;
 
@@ -34,7 +36,13 @@ int SimpleAdjacencyList::InsertVertex(const char *pName,int data){
     return OK;
 }
 
-int SimpleAdjacencyList::InsertEdge(const char *pNameA,const char *pNameB){
+/*!
+ * 有向图插入边方向 A->B
+ * @param pNameA
+ * @param pNameB
+ * @return
+ */
+int SimpleAdjacencyList::InsertEdge(const char *pNameA,const char *pNameB,int weight){
     int sAIdx=0;
     int sBIdx=0;
     AdjSide*pAdjSideA=nullptr;
@@ -45,6 +53,11 @@ int SimpleAdjacencyList::InsertEdge(const char *pNameA,const char *pNameB){
     CHECK_PARAM(!pAdjSideA,FAILED);
     pAdjSideA->adjvex=sBIdx;
     pAdjSideA->pNext=stVertexArray[sAIdx].pFirst;
+    stVertexArray[sAIdx].pFirst=pAdjSideA;
+    pAdjSideA->weight=weight;
+    // B的入度++ ref值为真实值,拓扑排序时可能修改非ref值
+    stVertexArray[sBIdx].sInDegreeRef++;
+    stVertexArray[sBIdx].sInDegree=stVertexArray[sBIdx].sInDegreeRef;
     return OK;
 }
 
@@ -155,6 +168,201 @@ void SimpleAdjacencyList::BfsTraverse(pAdjacencyVertexFunc pFunc){
     }
 }
 
+/*!
+ * 计算拓扑排序
+ * @return
+ */
+int SimpleAdjacencyList::TopologicalSort(){
+    int i=0;
+    int sPopIdx=0;
+    int sLoopCnt=0;
+    std::stack<int > s;
+    AdjSide*pSide=nullptr;
+    PtStruct();
+    // 需要了解的一点是,不存在删除边导致空位的情况
+    for(i=0;i<sVertexNum;i++){
+        if(stVertexArray[i].sInDegree==0){
+            s.push(i);
+        }
+    }
+    while(!s.empty()){
+
+        sPopIdx=s.top();
+        s.pop();
+        printf("Vertex %s\tdata %d\n",stVertexArray[sPopIdx].name,stVertexArray[sPopIdx].data);
+        pSide=stVertexArray[sPopIdx].pFirst;
+        while(pSide){
+            /*下面的代码块在有环时可以防止isIndeDegree产生-1这样的无意义值
+            if(stVertexArray[pSide->adjvex].sInDegree==1){
+                s.push(pSide->adjvex);
+            }
+            if(stVertexArray[pSide->adjvex].sInDegree>0){
+                stVertexArray[pSide->adjvex].sInDegree--;
+            }*/
+            // 有环情况下可能产生-1这样的无效值
+            stVertexArray[pSide->adjvex].sInDegree--;
+            if(stVertexArray[pSide->adjvex].sInDegree==0){
+                s.push(pSide->adjvex);
+            }
+            pSide=pSide->pNext;
+        }
+        sLoopCnt++;
+    }
+    TopologicalResetInDegree();
+
+    if(sLoopCnt<sVertexNum){
+        // 证明其中可能有环,对于所有能成环边上的顶点,将无法找到入度为0的顶点,因此环无法消除
+        // 可能存在大量无法消除的顶点
+        PRINT_ERR("maybe has circle sVertexNum %d loopcnts %d",sVertexNum,sLoopCnt);
+        return FAILED;
+    }else{
+        PRINT_ERR("topologic end times %d",sLoopCnt)
+        return OK;
+    }
+
+}
+
+/*!
+ * 复位入度值,求拓扑排序时会修改入度值
+ * @return
+ */
+void SimpleAdjacencyList::TopologicalResetInDegree(){
+    for(int i=0;i<sVertexNum;i++){
+        if(stVertexArray[i].bUsed){
+            stVertexArray[i].sInDegree=stVertexArray[i].sInDegreeRef;
+        }
+    }
+}
+
+/*!
+ * 计算拓扑排序
+ * @return
+ */
+int SimpleAdjacencyList::CalcKeyPath(){
+    int i=0;
+    int sPopIdx=0;
+    int sLoopCnt=0;
+    std::stack<int > s;
+    std::stack<int > ToplogicStack; //存放拓扑排序序列
+    AdjSide*pSide=nullptr;
+    std::array <int ,MAX_VERTEX_NUM> aEarly{};
+    std::array <int ,MAX_VERTEX_NUM> aLate{};
+
+    // 计算拓扑排序 代码和拓扑排序代码基本类似,增加栈临时存放拓扑序列
+    // 增加存放到达各个顶点最大损失的数组
+    for(i=0;i<sVertexNum;i++){
+        if(stVertexArray[i].sInDegree==0){
+            s.push(i);
+        }
+    }
+
+    while(!s.empty()){
+        sPopIdx=s.top();
+        s.pop();
+        ToplogicStack.push(sPopIdx);
+        printf("Vertex %s\tdata %d\n",stVertexArray[sPopIdx].name,stVertexArray[sPopIdx].data);
+        pSide=stVertexArray[sPopIdx].pFirst;
+        while(pSide){
+            // 不管关联的节点入度是否为0,都需要进行损失更新
+            if(aEarly[sPopIdx]+pSide->weight>aEarly[pSide->adjvex]){
+                aEarly[pSide->adjvex]=aEarly[sPopIdx]+pSide->weight;
+            }
+
+            stVertexArray[pSide->adjvex].sInDegree--;
+            if(stVertexArray[pSide->adjvex].sInDegree==0){
+                s.push(pSide->adjvex);
+            }
+            pSide=pSide->pNext;
+        }
+        sLoopCnt++;
+    }
+    TopologicalResetInDegree();
+    if(sLoopCnt<sVertexNum){
+        // 证明其中可能有环,对于所有能成环边上的顶点,将无法找到入度为0的顶点,因此环无法消除
+        // 可能存在大量无法消除的顶点
+        PRINT_ERR("maybe has circle sVertexNum %d loopcnts %d",sVertexNum,sLoopCnt);
+        return FAILED;
+    }else{
+        PRINT("topologic OK end times %d",sLoopCnt)
+    }
+
+    for(i=0;i<sVertexNum;i++){
+        printf("early idx %d value %d\n",i,aEarly[i]);
+    }
+
+    // 计算最迟开工时间
+    for(i=0;i<sVertexNum;i++){
+        aLate[i]=aEarly[sVertexNum-1];
+    }
+    // 需要求n顶点到终点路径的最大值,即 终点工时-路径损失的最小值
+    while(!ToplogicStack.empty()){
+        sPopIdx=ToplogicStack.top();
+        ToplogicStack.pop();
+        pSide=stVertexArray[sPopIdx].pFirst;
+        while(pSide){
+            // 不管关联的节点入度是否为0,都需要进行损失更新
+            // 求n节点到终点的最大值,即 终点工时-路径损失的最小值
+            // 如果当前节点的后继节点late值-边权值,小于本节点late值,则更新本节点late值更小
+            if(aLate[pSide->adjvex]-pSide->weight<aLate[sPopIdx]){
+                //如果后继节点的损失-路径损失<当前节点损失
+                aLate[sPopIdx]=aLate[pSide->adjvex]-pSide->weight;
+            }
+            pSide=pSide->pNext;
+        }
+    }
+    for(i=0;i<sVertexNum;i++){
+        printf("late idx %d value %d\n",i,aLate[i]);
+    }
+
+    for(i=0;i<sVertexNum;i++){
+        pSide=stVertexArray[i].pFirst;
+        while(pSide){
+            // 仅根据求解最早完成时间,然后计算哪个节点最后更新路径的更新
+            if(aEarly[i]+pSide->weight==aLate[pSide->adjvex]){
+                // 满足条件说明这条边卡的很紧凑,前后两个事件之间没有余量
+                // 前节点到来后,要立刻做这条边的事情,才能按时完成后节点的工期要求(这样才能满足整个项目的工期要求)
+                PRINT("path %s %s w %d keypath",
+                      stVertexArray[i].name,stVertexArray[pSide->adjvex].name,pSide->weight);
+            }
+            /*大话数据结构书上 为什么要用这种很奇怪的写法?*/
+            /*sEarlyTime=aEarly[i];
+            sLateTime=aLate[pSide->adjvex]-pSide->weight;
+            if(sEarlyTime==sLateTime){
+                PRINT("path %s %s w %d keypath",
+                        stVertexArray[i].name,stVertexArray[pSide->adjvex].name,pSide->weight);
+            }*/
+            pSide=pSide->pNext;
+        }
+    }
+
+
+    return OK;
+}
+
+
+void SimpleAdjacencyList::PtStruct(){
+    AdjSide*pSide= nullptr;
+    int sValidCnt=0;
+    PRINT("print Adjacency list struct vertex num %d",sVertexNum);
+    for(int i=0;i<MAX_VERTEX_NUM;i++){
+        if(stVertexArray[i].bUsed){
+            pSide=stVertexArray[i].pFirst;
+            printf("vertex idx %d\tname %s \tdata%d\t",i,stVertexArray[i].name,stVertexArray[i].data);
+            while(pSide){
+                printf("->idx %d\t",pSide->adjvex);
+                pSide=pSide->pNext;
+            }
+            printf("\n");
+
+            sValidCnt++;
+            if(sValidCnt>=sVertexNum){
+                break;
+            }
+        }
+    }
+}
+
+
 
 SimpleUndirAdjacencyList::SimpleUndirAdjacencyList():SimpleAdjacencyList(){
 
@@ -182,6 +390,7 @@ int SimpleUndirAdjacencyList::InsertUndirEdge(const char *pNameA, const char *pN
     stVertexArray[sBIdx].pFirst=pAdjSideB;
     return OK;
 }
+
 
 
 

@@ -14,11 +14,15 @@
 
 struct AdjSide{
     int adjvex;
+    int weight;
     AdjSide*pNext;
 };
 struct AdjVertex{
     char name[MAX_NAME_LEN];
     int data;
+    // 计算拓扑排序的时候会修改这个值,增加参考值,修改完复原
+    int sInDegree;
+    int sInDegreeRef;
     bool bUsed;
     AdjSide *pFirst;
 
@@ -35,9 +39,14 @@ public:
     SimpleAdjacencyList();
     ~SimpleAdjacencyList();
     int InsertVertex(const char *pName,int data);
-    int InsertEdge(const char *pNameA,const char *pNameB);
+    int InsertEdge(const char *pNameA,const char *pNameB,int weight=1);
     void DfsTraverse(pAdjacencyVertexFunc pFunc);
     void BfsTraverse(pAdjacencyVertexFunc pFunc);
+    // 拓扑排序,只有向图才有
+    int TopologicalSort();
+    void TopologicalResetInDegree();
+    int CalcKeyPath();
+    void PtStruct();
 protected:
     void dfs(int idx,std::array<bool,MAX_VERTEX_NUM> &visited,pAdjacencyVertexFunc pFunc);
     void bfs(int idx,std::array<bool,MAX_VERTEX_NUM> &visited,pAdjacencyVertexFunc pFunc);
