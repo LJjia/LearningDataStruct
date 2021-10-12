@@ -8,6 +8,7 @@
 #include "BinarySortTree.h"
 #include <iostream>
 #include <cstdlib>
+#include <queue>
 using namespace std;
 
 /*!
@@ -622,6 +623,41 @@ bool BinarySortTree::SearchDataRecursive(int data) {
     return bOK;
 }
 
+void BinarySortTree::PtBinaryStruct(){
+    BinaryTreeNode*pNode= nullptr;
+    BinaryTreeNode*pPtNode= nullptr;
+    queue <BinaryTreeNode*> queueLayer;
+    queue <BinaryTreeNode*> queuePt;
+    pNode=pRoot;
+    queueLayer.push(pRoot);
+    PRINT("start Pt Node struct")
+    for(int i=0;i<5;i++){
+        // 一共打印5层二叉树节点
+        while(!queueLayer.empty()){
+            pNode=queueLayer.front();
+            queuePt.push(pNode);
+            queueLayer.pop();
+        }
+        while(!queuePt.empty()){
+            pNode=queuePt.front();
+            if(pNode== nullptr){
+                printf("\t");
+                queueLayer.push(nullptr);
+                queueLayer.push(nullptr);
+            } else{
+                printf("%d\t",pNode->data);
+                queueLayer.push(pNode->pLeft);
+                queueLayer.push(pNode->pRight);
+            }
+            queuePt.pop();
+        }
+        printf("\n");
+
+    }
+
+
+}
+
 void TestBinarySortTree(){
     BinarySortTree*pSearch=new BinarySortTree();
     int datalist[10]={62,58,88,47,73,99,35,51,93,37};
@@ -651,7 +687,8 @@ void TestAvlTree(){
     for(int i=0;i<10 ;i++){
         pSearch->AvlInsertData(datalist[i]);
     }
-    pSearch->PtContent();
+//    pSearch->PtContent();
+    pSearch->PtBinaryStruct();
 
 
 }

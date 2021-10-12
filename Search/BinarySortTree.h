@@ -32,6 +32,7 @@ public:
     bool SearchData(int data,BinaryTreeNode**pRet);
     bool SearchDataRecursive(int data);
     void PtContent();
+    void PtBinaryStruct();
     enum BalanceFactor{
         Balance=0,
         LeftHeavy=1,
