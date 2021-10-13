@@ -210,7 +210,7 @@ void BinarySortTree::AvlProcMinTree(BinaryTreeNode*pNode){
 
     switch (pNode->bf){
         case LeftUnBalance:
-            if(!pNode->pRight){
+            if(!pNode->pRight&&pNode->pLeft->bf==RightHeavy){
                 // 值为1 的节点 没有右节点的情况 根节点右旋
                 RotateRight(pNode);
                 pNode=ppNodePos?*ppNodePos:pRoot;
@@ -222,7 +222,16 @@ void BinarySortTree::AvlProcMinTree(BinaryTreeNode*pNode){
                 RotateRight(pNode);
                 pNode=ppNodePos?*ppNodePos:pRoot;
                 pNode->bf=0;
-                pNode->pLeft->bf=1;
+                // 特殊 值不改变
+//                pNode->pLeft->bf=1;
+                pNode->pRight->bf=0;
+            }else if(!pNode->pRight&&pNode->pLeft->bf==RightHeavy){
+                // 简单<型
+                RotateLeft(pNode->pLeft);
+                RotateRight(pNode);
+                pNode=ppNodePos?*ppNodePos:pRoot;
+                pNode->bf=0;
+                pNode->pLeft->bf=0;
                 pNode->pRight->bf=0;
             }else if(pNode->pLeft->bf==RightHeavy&&pNode->pLeft->pRight->bf==RightHeavy){
                 // <型
@@ -255,7 +264,7 @@ void BinarySortTree::AvlProcMinTree(BinaryTreeNode*pNode){
             }
             break;
         case RightUnBalance:
-            if(!pNode->pLeft){
+            if(!pNode->pLeft&&pNode->pRight->bf==RightHeavy){
                 // 简单/
                 RotateLeft(pNode);
                 pNode=ppNodePos?*ppNodePos:pRoot;
@@ -268,7 +277,17 @@ void BinarySortTree::AvlProcMinTree(BinaryTreeNode*pNode){
                 pNode=ppNodePos?*ppNodePos:pRoot;
                 pNode->bf=0;
                 pNode->pLeft->bf=0;
-                pNode->pRight->bf=1;
+                // 特殊 值不改变
+//                pNode->pRight->bf=-1;
+            }else if(!pNode->pLeft&&pNode->pRight->bf==LeftHeavy){
+                // 简单>
+                RotateRight(pNode->pRight);
+                RotateLeft(pNode);
+                pNode=ppNodePos?*ppNodePos:pRoot;
+                pNode->bf=0;
+                pNode->pLeft->bf=0;
+                pNode->pRight->bf=0;
+
             }else if(pNode->pRight->bf==LeftHeavy&&pNode->pRight->pLeft->bf==LeftHeavy){
                 // >型
                 RotateRight(pNode->pRight);
@@ -277,7 +296,7 @@ void BinarySortTree::AvlProcMinTree(BinaryTreeNode*pNode){
                 pNode->bf=0;
                 pNode->pLeft->bf=0;
                 pNode->pRight->bf=-1;
-            } else if(pNode->pRight->bf==RightHeavy&&pNode->pRight->pLeft->bf==RightHeavy){
+            } else if(pNode->pRight->bf==LeftHeavy&&pNode->pRight->pLeft->bf==RightHeavy){
                 // 闪电1型
                 RotateRight(pNode->pRight);
                 RotateLeft(pNode);
@@ -286,7 +305,7 @@ void BinarySortTree::AvlProcMinTree(BinaryTreeNode*pNode){
                 pNode->pLeft->bf=1;
                 pNode->pRight->bf=0;
             }
-            else if(pNode->pRight->bf==RightHeavy&&pNode->pRight->pLeft->bf==Balance){
+            else if(pNode->pRight->bf==LeftHeavy&&pNode->pRight->pLeft->bf==Balance){
                 // 闪电2型
                 RotateRight(pNode->pRight);
                 RotateLeft(pNode);
@@ -296,7 +315,7 @@ void BinarySortTree::AvlProcMinTree(BinaryTreeNode*pNode){
                 pNode->pRight->bf=0;
             }
             else{
-                PRINT_MODE(PT_RED,"RightUnBalance maybe some err happened");
+                PRINT_MODE(PT_RED,"RightUnBalance maybe some err happened rightbf %d",pNode->pRight->bf);
             }
             break;
         default:
@@ -641,7 +660,7 @@ void BinarySortTree::PtBinaryStruct(){
         while(!queuePt.empty()){
             pNode=queuePt.front();
             if(pNode== nullptr){
-                printf("\t");
+                printf("null\t");
                 queueLayer.push(nullptr);
                 queueLayer.push(nullptr);
             } else{
