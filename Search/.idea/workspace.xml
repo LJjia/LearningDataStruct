@@ -12,15 +12,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="217148ff-33d5-4379-a3b2-98495dc63c70" name="默认更改列表" comment="">
-      <change afterPath="$PROJECT_DIR$/BinarySortTree.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BinarySortTree.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/OrderArraySearch.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/comm.c" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/comm.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data_type.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/main.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../Tree/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BinarySortTree.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/BinarySortTree.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Tree/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../Tree/.idea/workspace.xml" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/cmake-build-debug/" />
@@ -54,11 +46,11 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/BinarySortTree.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="345">
-              <caret line="653" column="12" selection-start-line="653" selection-start-column="12" selection-end-line="653" selection-end-column="12" />
+            <state relative-caret-position="369">
+              <caret line="710" lean-forward="true" selection-start-line="710" selection-end-line="710" />
               <folding>
                 <element signature="e#125#152#0" expanded="true" />
-                <element signature="e#1597#4517#0" expanded="true" />
+                <element signature="e#9375#12295#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -67,8 +59,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/BinarySortTree.h">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="338">
-              <caret line="42" column="45" selection-start-line="42" selection-start-column="45" selection-end-line="42" selection-end-column="45" />
+            <state relative-caret-position="984">
+              <caret line="42" column="10" selection-start-line="42" selection-start-column="10" selection-end-line="42" selection-end-column="10" />
             </state>
           </provider>
         </entry>
@@ -76,7 +68,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/comm.c">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="210">
+            <state relative-caret-position="1416">
               <caret line="59" selection-start-line="59" selection-end-line="59" />
             </state>
           </provider>
@@ -85,7 +77,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/OrderArraySearch.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="372">
+            <state relative-caret-position="3144">
               <caret line="131" column="36" selection-start-line="131" selection-start-column="36" selection-end-line="131" selection-end-column="36" />
             </state>
           </provider>
@@ -126,7 +118,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -138,6 +129,7 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -253,8 +245,8 @@
     <frame x="0" y="0" width="1680" height="1050" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49923897" visible="true" weight="0.25274727" />
-      <window_info id="Structure" order="1" sideWeight="0.50076103" side_tool="true" visible="true" weight="0.25274727" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.4977169" visible="true" weight="0.25579977" />
+      <window_info id="Structure" order="1" sideWeight="0.5022831" side_tool="true" visible="true" weight="0.25579977" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
@@ -277,14 +269,34 @@
     </layout>
   </component>
   <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/BinarySortTree.cpp</url>
+          <line>69</line>
+          <option name="timeStamp" value="8" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
     <watches-manager>
       <configuration name="CMakeRunConfiguration">
         <watch expression="pRoot" language="ObjectiveC" />
+        <watch expression="data" language="ObjectiveC" />
       </configuration>
     </watches-manager>
   </component>
   <component name="debuggerHistoryManager">
     <expressions id="breakpointCondition">
+      <expression>
+        <expression-string>data=8</expression-string>
+        <language-id>ObjectiveC</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>data=7</expression-string>
+        <language-id>ObjectiveC</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
       <expression>
         <expression-string>data=47</expression-string>
         <language-id>ObjectiveC</language-id>
@@ -292,6 +304,11 @@
       </expression>
     </expressions>
     <expressions id="watch">
+      <expression>
+        <expression-string>data</expression-string>
+        <language-id>ObjectiveC</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
       <expression>
         <expression-string>pRoot</expression-string>
         <language-id>ObjectiveC</language-id>
@@ -317,27 +334,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/OrderArraySearch.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="372">
-          <caret line="131" column="36" selection-start-line="131" selection-start-column="36" selection-end-line="131" selection-end-column="36" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/comm.c">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="210">
-          <caret line="59" selection-start-line="59" selection-end-line="59" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/BinarySortTree.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="338">
-          <caret line="42" column="45" selection-start-line="42" selection-start-column="45" selection-end-line="42" selection-end-column="45" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/main.cpp">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="288">
@@ -345,13 +341,34 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/BinarySortTree.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="984">
+          <caret line="42" column="10" selection-start-line="42" selection-start-column="10" selection-end-line="42" selection-end-column="10" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/comm.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1416">
+          <caret line="59" selection-start-line="59" selection-end-line="59" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/OrderArraySearch.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3144">
+          <caret line="131" column="36" selection-start-line="131" selection-start-column="36" selection-end-line="131" selection-end-column="36" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/BinarySortTree.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="345">
-          <caret line="653" column="12" selection-start-line="653" selection-start-column="12" selection-end-line="653" selection-end-column="12" />
+        <state relative-caret-position="369">
+          <caret line="710" lean-forward="true" selection-start-line="710" selection-end-line="710" />
           <folding>
             <element signature="e#125#152#0" expanded="true" />
-            <element signature="e#1597#4517#0" expanded="true" />
+            <element signature="e#9375#12295#0" expanded="true" />
           </folding>
         </state>
       </provider>
