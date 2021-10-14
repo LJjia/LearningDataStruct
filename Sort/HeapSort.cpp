@@ -9,6 +9,7 @@
 
 
 #include "data.h"
+#include "comm.h"
 #include <cstdio>
 
 /*!
@@ -26,26 +27,31 @@ void HeapAdjust(int *pData,int len,int sRootIdx){
         return ;
     }
     tmp=pData[sRootIdx];
-    sBiggerIdx=sRootIdx;
+//    sBiggerIdx=sRootIdx;
     // sRootIdx为索引 实际孩子节点公式从1开始,需要处理
     // 以下循环需要注意,i是第几个从1开始,sBiggerIdx是索引,从0开始,注意之间的转换
-    for(i=sRootIdx+1;i*2<len;i=i*2){
-        sBiggerIdx=i-1;
+    for(i=sRootIdx+1;i*2<=len;){
+//        sBiggerIdx=i-1;
         if(pData[i-1]<pData[i*2-1]){
             sBiggerIdx=i*2-1;
             // 找孩子节点最大的值
             // 首先判断是不是存在右孩子节点,然后判断左右孩子节点哪个大
-            if((i*2+1)<len&&pData[i*2-1]<pData[i*2]){
+            if((i*2+1)<=len&&pData[i*2-1]<pData[i*2]){
                 sBiggerIdx=i*2;
             }
-        }else{
+        }else if((i*2+1)<=len&&pData[i-1]<pData[i*2]){
+            // 如果根节点大于左孩子但是小于右孩子
+            sBiggerIdx=i*2;
+        }
+        else{
             // 证明root已经比孩子节点大,结束
             break;
         }
         pData[i-1]=pData[sBiggerIdx];
+        pData[sBiggerIdx]=tmp;
         i=sBiggerIdx+1;
     }
-    pData[sBiggerIdx]=tmp;
+
 
 }
 
@@ -54,17 +60,12 @@ void HeapSort(int *pData,int len){
     for(i=len/2-1;i>=0;i--){
         HeapAdjust(pData,len,i);
 
-        for(int i=0;i<len;i++){
-            printf("%d\t",pData[i]);
-        }
-        printf("\n");
+
     }
-
-
 
     for(i=len-1;i>0;i--){
         swap(pData[0],pData[i]);
-        HeapAdjust(pData,len,0);
+        HeapAdjust(pData,i,0);
     }
 }
 
