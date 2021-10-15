@@ -5,13 +5,14 @@ void TestBubble();
 void TestSelect();
 void TestInsertSort();
 //void TestShellSort();
-void TestHeapSort();
+//void TestHeapSort();
+void TestMergeSort();
 
 int main() {
     std::cout << "Hello, World!" << std::endl;
 //    TestBubble();
 //    TestSelect();
 //    TestInsertSort();
-    TestHeapSort();
+    TestMergeSort();
     return 0;
 }
