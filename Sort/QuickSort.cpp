@@ -48,16 +48,12 @@ void QuickSortInterval(int *pData,int sStartIdx,int sEndIdx){
         }
         // 不采用swap的方式可以减少一次赋值
         // 此时最左端元素相当于空出位置,将合适的元素放置到最左端
-//        swap(pData[left],pData[right]);
         pData[left]=pData[right];
         //pData[left]小于tmp 才会被移动,所以下个while循环肯定成立,不需要手动left++
-//        left++;
         while(left<right&&pData[left]<=tmp){
             left++;
         }
-//        swap(pData[left],pData[right]);
         pData[right]=pData[left];
-//        right--;
     }
     pData[left]=tmp;
     // 如果是交换swap,则不需要最后pData[left]=tmp赋值,
