@@ -15,7 +15,7 @@
 
 /*!
  * 合并pData中两个有序数列的数据到pOut中,输出在pOut中的位置和pData中相同
- * 二分归并使得这里的索引可以是start mid 和 end三个值,切分为start-mid 和mid-end两段
+ * 二分归并使得这里的索引可以是start mid 和 end三个值,切分为start-mid 和mid+1-end两段
  * @param pData
  * @param pOut
  * @param start 第一个有序序列开始索引
@@ -44,7 +44,8 @@ void MergeData(int *pData,int *pOut,int start,int mid,int end){
 }
 
 /*!
- * 对数组从start开始到end的元素进行归并排序,从pData中取元素,输出到pOut中
+ * 对pData数组从start开始到end的元素进行归并排序,pOut只为临时缓存,
+ * 每当此函数调用结束后 归并结果会输出到pData中!
  * @param pData 源数据地址
  * @param pOut 输出地址
  * @param start 开始idx
@@ -56,6 +57,7 @@ void MergeSort(int *pData,int *pOut,int start ,int end){
         return ;
     }
     if(start==end){
+        // 因为目的是对pData进行排序,所以当排序个数只有一个时,不需要排序
 //        pOut[start]=pData[start];
         return ;
     }else{
@@ -64,8 +66,11 @@ void MergeSort(int *pData,int *pOut,int start ,int end){
         MergeSort(pData,pOut,start,mid);
         MergeSort(pData,pOut,mid+1,end);
         MergeData(pData,pOut,start,mid,end);
-        memcpy(&pData[start],&pOut[start], sizeof(int)*(end-start+1));
         // 先拷贝到一个临时的内存中,然后这个临时的值再拷贝到原先内存中
+        // 必须有下面这个拷贝是因为要把合并的结果保存在pData内存中,否则外层递归循环的时候,
+        // 是用的还是原先的pData内容
+        memcpy(&pData[start],&pOut[start], sizeof(int)*(end-start+1));
+
     }
 }
 
@@ -83,10 +88,16 @@ void MergeSortRecursive(int *pData,int len){
 
 
 /*!
- * 合并特定长度的片段
+ * 合并pData中长度为slice的片段到pOut中
+ * 合并的意思是比如slice=2,调用此函数,会将pData中相邻的长度为2的slice合并为一个长度为4的有序片段
+ * 函数执行结束后,pOut中长度为2slice的片段会有序
+ * 如长度为2的片段序号为0,1,2,3,4,5 合并后变成片段 01,23,45,并且每个片段中都有序,
+ * 并把合并后和pData中相同长度的内容输出到pOut中
+ * 如果最后pData中数据长度小于1个slice,则直接拷贝,如果大于一个slice小于2个slice,则合并这一个半slice
  * @param pData
+ * @param pOut
  * @param slice
- * @param sTotalLen
+ * @param sTotalLen pData数据总长
  */
 void MergeLenSlice(int *pData,int *pOut,int slice,int sTotalLen){
 
@@ -129,6 +140,7 @@ void MergeSortLoop(int *pData,int len){
     int buff[MAX_DATA_LEN]{};
     int slice=1;
     while(slice<len){
+        // 数据拷贝到buff中后,拷回来的同时再进行一次归并
         MergeLenSlice(pData,buff,slice,len);
         slice*=2;
         MergeLenSlice(buff,pData,slice,len);

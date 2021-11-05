@@ -483,10 +483,13 @@ void ThreadMiddleEstabBinTree(BinaryTreeNode* pNode){
     CHECK_PARAM(!pNode,)
     ThreadMiddleEstabBinTree(pNode->pLeft);
     // 应对线索指针的 node节点的头尾两个节点,所以需要加上枚举判断
+
+    // 可以根据右线索节点使用循环遍历
     if(pLatsNode&&pLatsNode->enRight==TREE_POINT_NODE&&pLatsNode->pRight== nullptr){
         pLatsNode->enRight=TREE_POINT_THREAD;
         pLatsNode->pRight=pNode;
     }
+    // 左线索节点仅仅指向前驱,对倒序遍历有一定作用,优先访问线索,不是线索则访问左孩子节点的最右节点
     if(pNode->enLeft==TREE_POINT_NODE&&pNode->pLeft== nullptr){
         pNode->enLeft=TREE_POINT_THREAD;
         pNode->pLeft=pLatsNode;
