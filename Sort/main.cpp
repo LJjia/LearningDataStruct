@@ -8,6 +8,7 @@ void TestInsertSort();
 //void TestHeapSort();
 void TestMergeSort();
 void  TestRaidxSort();
+void TestQuickSort();
 
 int main() {
     std::cout << "Hello, World!" << std::endl;
@@ -16,5 +17,6 @@ int main() {
 //    TestInsertSort();
 //    TestMergeSort();
     TestRaidxSort();
+    TestQuickSort();
     return 0;
 }
